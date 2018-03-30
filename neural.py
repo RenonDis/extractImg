@@ -5,7 +5,7 @@ import numpy as np
 from mnist import MNIST 
 #from scipy.spatial import distance
 
-path = str(sys.argv[1])
+#path = str(sys.argv[1])
 
 def lecture_mnist(path):
 
@@ -64,9 +64,30 @@ def kppv_predict(Dist, Yapp, K):
 
 if __name__ == "__main__":
 
-    X, Y = lecture_mnist(path)
-    a, b, c, d = decoupage_donnees(X[0:20], Y[0:20])
+    np.random.seed(1)
+    N, D_in, D_h, D_out = 30, 2, 10, 3
 
-    dists = kppv_distances(a,c)
+    # Creation d'une matrice d'entree X et de sortie Y avec des valeurs aleatoires
+    X = np.random.random((N, D_in))
+    Y = np.random.random((N, D_out))
 
-    kppv_predict(dists, b, 3)
+    # Initialisation aleatoire des poids du reseau
+    W1 = 2 * np.random.random((D_in, D_h)) - 1
+    b1 = np.zeros((1,D_h))
+    W2 = 2 * np.random.random((D_h, D_out)) - 1
+    b2 = np.zeros((1,D_out))
+
+    ####################################################
+    # Passe avant : calcul de la sortie predite Y_pred #
+    ####################################################
+    I1 = X.dot(W1) + b1 # Potentiel d'entree de la couche cachee
+    O1 = 1/(1+np.exp(-I1)) # Sortie de la couche cachee (fonction d'activation de type sigmoide)
+    I2 = O1.dot(W2) + b2 # Potentiel d'entree de la couche de sortie
+    O2 = 1/(1+np.exp(-I2)) # Sortie de la couche de sortie (fonction d'activation de type sigmoide)
+    Y_pred = O2 # Les valeurs predites sont les sorties de la couche de sortie
+    
+    ########################################################
+    # Calcul et affichage de la fonction perte de type MSE #
+    ########################################################
+    loss = np.square(Y_pred - Y).sum() / 2
+    print(loss)
